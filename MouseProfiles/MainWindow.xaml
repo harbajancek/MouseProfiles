@@ -5,7 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MouseProfiles"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        ShowInTaskbar="False"
+        WindowState="Minimized"
+        Topmost="True"
+        ResizeMode="NoResize"
+        Title="MainWindow" Height="300" Width="200"
+        Closing="Window_Closing">
     <Grid>
         
     </Grid>
