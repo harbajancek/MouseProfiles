@@ -10,8 +10,10 @@
         Topmost="True"
         ResizeMode="NoResize"
         Title="MainWindow" Height="300" Width="200"
-        Closing="Window_Closing">
+        Closing="Window_Closing"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid>
-        
+        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" ItemsSource="{Binding Path={local:MouseProfile.MouseProfiles}}" DisplayMemberPath="Name"/>
+
     </Grid>
 </Window>

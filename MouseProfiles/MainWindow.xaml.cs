@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Collections.ObjectModel;
 
 namespace MouseProfiles
 {
@@ -30,6 +31,12 @@ namespace MouseProfiles
             ni.Icon = new Icon("Main.ico");
             ni.Visible = true;
             ni.Click += NotifyIcon_Click;
+            ni.DoubleClick += NotifyIcon_DoubleClick;
+        }
+
+        private void NotifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            App.Current.Shutdown();
         }
 
         private void NotifyIcon_Click(object sender, EventArgs e)
