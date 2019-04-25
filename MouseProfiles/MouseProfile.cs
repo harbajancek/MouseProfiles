@@ -10,19 +10,8 @@ using System.Threading.Tasks;
 namespace MouseProfiles
 {
     [JsonObject(MemberSerialization.OptIn)]
-    class MouseProfile
+    public class MouseProfile
     {
-        private static string filterString;
-        public static ObservableCollection<MouseProfile> MouseProfiles = new ObservableCollection<MouseProfile>();
-        public static void Activator(MouseProfile profile)
-        {
-            foreach (var item in MouseProfiles)
-            {
-                item.Activated = false;
-            }
-
-            profile.Activate();
-        }
         public string Name { get; set; }
         public bool Activated { get; private set; }
         const int SPI_SETMOUSESPEED = 0x0071;
@@ -35,10 +24,10 @@ namespace MouseProfiles
         private bool _mouseButtonSwap;
 
         [DllImport("User32.dll")]
-        static extern Boolean SystemParametersInfo(
+        static extern object SystemParametersInfo(
             UInt32 uiAction,
             object uiParam,
-            UInt32 pvParam,
+            object pvParam,
             UInt32 fWinIni);
 
         [JsonProperty]

@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace MouseProfiles
 {
