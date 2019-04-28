@@ -13,10 +13,7 @@
         Title="MainWindow" Height="300" Width="200"
         Closing="Window_Closing"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
-    <Window.Resources>
-        <vms:MouseProfileViewModel x:Key="mouseProfile"/>
-    </Window.Resources>
     <Grid>
-        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" ItemsSource="{Binding Source={StaticResource mouseProfile}}" DisplayMemberPath="Name"/>
+        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" ItemsSource="{Binding Path=MouseProfileViewModel}" DisplayMemberPath="Name"/>
     </Grid>
 </Window>

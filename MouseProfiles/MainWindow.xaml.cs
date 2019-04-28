@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Collections.ObjectModel;
 using System.IO;
+using MouseProfiles.ViewModels;
 
 namespace MouseProfiles
 {
@@ -24,15 +25,25 @@ namespace MouseProfiles
     /// </summary>
     public partial class MainWindow : Window
     {
+        MouseProfileViewModel MouseProfileViewModel { get; set; }
         public MainWindow()
         {
+            this.Initialized += MainWindow_Initialized;
+
             InitializeComponent();
 
-            NotifyIcon ni = new NotifyIcon();
-            ni.Icon = new Icon("Main.ico");
-            ni.Visible = true;
+            NotifyIcon ni = new NotifyIcon
+            {
+                Icon = new Icon("Main.ico"),
+                Visible = true
+            };
             ni.Click += NotifyIcon_Click;
             ni.DoubleClick += NotifyIcon_DoubleClick;
+        }
+
+        private async void MainWindow_Initialized(object sender, EventArgs e)
+        {
+            MouseProfileViewModel = await MouseProfileViewModel.Create();
         }
 
         private void NotifyIcon_DoubleClick(object sender, EventArgs e)

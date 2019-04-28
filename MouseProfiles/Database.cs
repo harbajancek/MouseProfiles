@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MouseProfiles.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,17 +11,31 @@ namespace MouseProfiles
 {
     class Database
     {
-        private JsonSerializerSettings settings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All };
-        string dbPath { get; set; }
-        public Database(string dbPath)
+        private readonly JsonSerializerSettings settings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All };
+        readonly string dbPath;
+        public Database(string dbName)
         {
-            dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dbPath + ".json");
+            this.dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dbName + ".json");
         }
-        public List<MouseProfile> GetMouseProfiles()
+        public async Task<IEnumerable<MouseProfileModel>> GetMouseProfilesAsync()
         {
-            return JsonConvert.DeserializeObject<List<MouseProfile>>(GetStringData());
+            return await Task.Factory.StartNew<IEnumerable<MouseProfileModel>>(() =>
+            {
+                return GetMouseProfiles();
+            });
         }
-        public void SaveMouseProfiles(List<MouseProfile> profiles)
+        public IEnumerable<MouseProfileModel> GetMouseProfiles()
+        {
+            return JsonConvert.DeserializeObject<IEnumerable<MouseProfileModel>>(GetStringData());
+        }
+        public async Task SaveMouseProfilesAsync(IEnumerable<MouseProfileModel> profiles)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                 SaveMouseProfiles(profiles);
+            });
+        }
+        public void SaveMouseProfiles(IEnumerable<MouseProfileModel> profiles)
         {
             string data = JsonConvert.SerializeObject(profiles, settings);
             File.WriteAllText(dbPath, data);
