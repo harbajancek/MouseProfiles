@@ -6,14 +6,55 @@
         xmlns:local="clr-namespace:MouseProfiles"
         xmlns:vms="clr-namespace:MouseProfiles.ViewModels"
         mc:Ignorable="d"
-        ShowInTaskbar="False"
         WindowState="Minimized"
         Topmost="True"
         ResizeMode="NoResize"
-        Title="MainWindow" Height="300" Width="200"
+        Title="MainWindow" Height="370" Width="200"
         Closing="Window_Closing"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
-    <Grid>
-        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" ItemsSource="{Binding Path=MouseProfileViewModel}" DisplayMemberPath="Name"/>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <Label Content="Profile Name"/>
+            <TextBox x:Name="NewProfileNameTextBox"/>
+            <Button Content="Create" Click="CreateProfile_Click"/>
+            <Label Content="Select Profile"/>
+            <ComboBox SelectionChanged="SelectProfile_SelectionChanged" x:Name="SelectProfile" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" ItemsSource="{Binding MouseProfileViewModel.Profiles}" DisplayMemberPath="Name"/>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="1">
+
+            <Label Content="Name:"/>
+            <TextBox x:Name="ProfileNameTextBox" Text="{Binding MouseProfileViewModel.SelectedProfile.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <CheckBox x:Name="ButtonSwapCheck" IsChecked="{Binding MouseProfileViewModel.SelectedProfile.MouseButtonSwap, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Swap Mouse Buttons</CheckBox>
+            
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Mouse Speed:"/>
+                <Label Content="{Binding ElementName=MouseSpeedSlider, Path=Value}"/>
+            </StackPanel>
+            <Slider x:Name="MouseSpeedSlider" Value="{Binding MouseProfileViewModel.SelectedProfile.MouseSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Maximum="20" Minimum="1"/>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Scroll Wheel Lines:"/>
+                <Label Content="{Binding ElementName=WheelLinesSlider, Path=Value}"/>
+            </StackPanel>
+            <Slider x:Name="WheelLinesSlider" Value="{Binding MouseProfileViewModel.SelectedProfile.WheelLines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Maximum="20" Minimum="1"/>
+
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Double Click Time:"/>
+                <TextBox x:Name="DoubleClickTimeTextBox" Text="{Binding ElementName=DoubleClickTimeSlider, Path=Value, Mode=TwoWay}" PreviewTextInput="DoubleClickTimeTextBox_PreviewTextInput"/>
+            </StackPanel>
+            <Slider x:Name="DoubleClickTimeSlider" Value="{Binding MouseProfileViewModel.SelectedProfile.DoubleClickTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Maximum="5000"/>
+
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Activate" Click="ActivateProfileButton_Click"/>
+                <Button x:Name="DeleteProfileButton" Content="Delete" Click="DeleteProfile_Click"/>
+            </StackPanel>
+            
+        </StackPanel>
     </Grid>
 </Window>

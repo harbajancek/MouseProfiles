@@ -15,13 +15,14 @@ namespace MouseProfiles.Services
             Database = new Database("Profiles");
         }
         private Database Database { get; set; }
-        public async Task<IEnumerable<MouseProfileModel>> GetProfiles()
+        public IEnumerable<MouseProfileModel> GetProfiles()
         {
-            return await Database.GetMouseProfilesAsync().ConfigureAwait(true);
+            return Database.GetMouseProfiles();
         }
-        public async Task SaveProfiles(IEnumerable<MouseProfileModel> profiles)
+        public void SaveProfiles(IEnumerable<MouseProfileModel> profiles)
         {
-            await Database.SaveMouseProfilesAsync(profiles);
+            profiles = profiles.Skip(1);
+            Database.SaveMouseProfiles(profiles);
         }
         const int SM_SWAPBUTTON = 0x0017;
         const int SPI_GETMOUSESPEED = 0x0070;
@@ -34,7 +35,7 @@ namespace MouseProfiles.Services
         class SPI_SetMouseInt
         {
             [DllImport("User32.dll")]
-            internal static extern object SystemParametersInfo(
+            internal static extern bool SystemParametersInfo(
             uint uiAction,
             uint uiParam,
             uint pvParam,
@@ -43,7 +44,7 @@ namespace MouseProfiles.Services
         class SPI_SetMouseBool
         {
             [DllImport("User32.dll")]
-            internal static extern object SystemParametersInfo(
+            internal static extern bool SystemParametersInfo(
             uint uiAction,
             bool uiParam,
             uint pvParam,
@@ -52,7 +53,7 @@ namespace MouseProfiles.Services
         class SPI_GetMouseInt
         {
             [DllImport("User32.dll")]
-            internal static extern object SystemParametersInfo(
+            internal static extern bool SystemParametersInfo(
             uint uiAction,
             uint uiParam,
             IntPtr pvParam,
@@ -63,31 +64,28 @@ namespace MouseProfiles.Services
         [DllImport("User32.dll")]
         static extern int GetSystemMetrics(
             int nIndex);
-        public async Task ApplyProfile(MouseProfileModel profile)
+        public void ApplyProfile(MouseProfileModel profile)
         {
-            await Task.Factory.StartNew(() =>
-            {
-                SPI_SetMouseInt.SystemParametersInfo(
-                    SPI_SETMOUSESPEED,
-                    0,
-                    profile.MouseSpeed,
-                    0);
-                SPI_SetMouseInt.SystemParametersInfo(
-                    SPI_SETDOUBLECLICKTIME,
-                    profile.DoubleClickTime,
-                    0,
-                    0);
-                SPI_SetMouseInt.SystemParametersInfo(
-                    SPI_SETWHEELSCROLLLINES,
-                    profile.WheelLines,
-                    0,
-                    0);
-                SPI_SetMouseBool.SystemParametersInfo(
-                    SPI_SETMOUSEBUTTONSWAP,
-                    profile.MouseButtonSwap,
-                    0,
-                    0);
-            });
+            SPI_SetMouseInt.SystemParametersInfo(
+                   SPI_SETMOUSESPEED,
+                   0,
+                   profile.MouseSpeed,
+                   0);
+            SPI_SetMouseInt.SystemParametersInfo(
+                SPI_SETDOUBLECLICKTIME,
+                profile.DoubleClickTime,
+                0,
+                0);
+            SPI_SetMouseInt.SystemParametersInfo(
+                SPI_SETWHEELSCROLLLINES,
+                profile.WheelLines,
+                0,
+                0);
+            SPI_SetMouseBool.SystemParametersInfo(
+                SPI_SETMOUSEBUTTONSWAP,
+                profile.MouseButtonSwap,
+                0,
+                0);
         }
         public MouseProfileModel GetDefaultMouseProfile()
         {
@@ -96,39 +94,33 @@ namespace MouseProfiles.Services
                 MouseSpeed = 10,
                 WheelLines = 3,
                 DoubleClickTime = 500,
-                MouseButtonSwap = false
+                MouseButtonSwap = false,
+                Name = "Default"
             };
             return profile;
         }
-        public async Task<MouseProfileModel> GetCurrentMouseProfile()
+        public unsafe MouseProfileModel GetCurrentMouseProfile()
         {
-            return await Task.Factory.StartNew<MouseProfileModel>(() => 
-            {
-                MouseProfileModel profile = new MouseProfileModel();
-                uint utemp;
-                unsafe
-                {
+            MouseProfileModel profile = new MouseProfileModel();
+            int utemp;
+            SPI_GetMouseInt.SystemParametersInfo(
+                SPI_GETMOUSESPEED,
+                0,
+                new IntPtr(&utemp),
+                0);
+            profile.MouseSpeed = (uint)utemp;
 
-                    SPI_GetMouseInt.SystemParametersInfo(
-                        SPI_GETMOUSESPEED,
-                        0,
-                        new IntPtr(&utemp),
-                        0);
-                    profile.MouseSpeed = utemp;
-
-                    SPI_GetMouseInt.SystemParametersInfo(
-                        SPI_GETWHEELSCROLLLINES,
-                        0,
-                        new IntPtr(&utemp),
-                        0);
-                    profile.WheelLines = utemp;
-                }
-                profile.DoubleClickTime = GetDoubleClickTime();
-                int temp = GetSystemMetrics(SM_SWAPBUTTON);
-                profile.MouseButtonSwap = (temp != 0) ? true : false;
-                profile.Name = "Current";
-                return profile;
-            });
+            SPI_GetMouseInt.SystemParametersInfo(
+                SPI_GETWHEELSCROLLLINES,
+                0,
+                new IntPtr(&utemp),
+                0);
+            profile.WheelLines = (uint)utemp;
+            profile.DoubleClickTime = GetDoubleClickTime();
+            int temp = GetSystemMetrics(SM_SWAPBUTTON);
+            profile.MouseButtonSwap = (temp != 0) ? true : false;
+            profile.Name = "Current";
+            return profile;
         }
     }
 }

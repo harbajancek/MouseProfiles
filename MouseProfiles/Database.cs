@@ -17,23 +17,9 @@ namespace MouseProfiles
         {
             this.dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dbName + ".json");
         }
-        public async Task<IEnumerable<MouseProfileModel>> GetMouseProfilesAsync()
-        {
-            return await Task.Factory.StartNew<IEnumerable<MouseProfileModel>>(() =>
-            {
-                return GetMouseProfiles();
-            });
-        }
         public IEnumerable<MouseProfileModel> GetMouseProfiles()
         {
             return JsonConvert.DeserializeObject<IEnumerable<MouseProfileModel>>(GetStringData());
-        }
-        public async Task SaveMouseProfilesAsync(IEnumerable<MouseProfileModel> profiles)
-        {
-            await Task.Factory.StartNew(() =>
-            {
-                 SaveMouseProfiles(profiles);
-            });
         }
         public void SaveMouseProfiles(IEnumerable<MouseProfileModel> profiles)
         {

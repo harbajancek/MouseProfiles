@@ -12,49 +12,57 @@ namespace MouseProfiles.ViewModels
 {
     public class MouseProfileViewModel : INotifyPropertyChanged
     {
-        public static async Task<MouseProfileViewModel> Create()
-        {
-            var ret = new MouseProfileViewModel();
-            await ret.Initialize();
-            return ret;
-        }
-        private MouseProfileViewModel()
+        public MouseProfileViewModel()
         {
             Profiles = new ObservableCollection<MouseProfileModel>();
             Service = new MouseProfileService();
             App.Current.Exit += Current_Exit;
+            IEnumerable<MouseProfileModel> profiles = Service.GetProfiles();
+            PopulateProfiles(profiles);
         }
 
         private void Current_Exit(object sender, System.Windows.ExitEventArgs e)
         {
-            SaveProfiles().Wait();
+            SaveProfiles();
         }
 
-        private async Task Initialize()
+        private void PopulateProfiles(IEnumerable<MouseProfileModel> profiles)
         {
-            IEnumerable<MouseProfileModel> profiles = await Service.GetProfiles();
-            await PopulateProfiles(profiles);
-        }
-
-        private async Task PopulateProfiles(IEnumerable<MouseProfileModel> profiles)
-        {
-            await Task.Factory.StartNew(async () =>
+            Profiles.Clear();
+            Profiles.Add(Service.GetDefaultMouseProfile());
+            if (profiles == null)
             {
-                Profiles.Clear();
-                Profiles.Add(Service.GetDefaultMouseProfile());
-                Profiles.Add(await Service.GetCurrentMouseProfile());
-                foreach (var item in profiles)
-                {
-                    Profiles.Add(item);
-                }
-            });
+                return;
+            }
+            foreach (var item in profiles)
+            {
+                Profiles.Add(item);
+            }
         }
-        public async Task SaveProfiles()
+        public void ActivateSelectedProfile()
         {
-            await Service.SaveProfiles(Profiles);
+            Service.ApplyProfile(SelectedProfile);
         }
-        public MouseProfileService Service;
-        public ObservableCollection<MouseProfileModel> Profiles;
+        public void CreateNewProfile(string name)
+        {
+            if (Profiles.Any(e => e.Name == name))
+            {
+                return;
+            }
+            MouseProfileModel profile = Service.GetDefaultMouseProfile();
+            profile.Name = name;
+            Profiles.Add(profile);
+        }
+        public void DeleteSelectedProfile()
+        {
+            Profiles.Remove(SelectedProfile);
+        }
+        public void SaveProfiles()
+        {
+            Service.SaveProfiles(Profiles);
+        }
+        public MouseProfileService Service { get; set; }
+        public ObservableCollection<MouseProfileModel> Profiles { get; set; }
         private MouseProfileModel selectedProfile;
         public MouseProfileModel SelectedProfile
         {
