@@ -15,7 +15,7 @@ namespace MouseProfiles.Services
             Database = new Database("Profiles");
         }
         private Database Database { get; set; }
-        public IEnumerable<MouseProfileModel> GetProfiles()
+        public  IEnumerable<MouseProfileModel> GetProfiles()
         {
             return Database.GetMouseProfiles();
         }
