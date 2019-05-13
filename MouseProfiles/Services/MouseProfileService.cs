@@ -21,8 +21,8 @@ namespace MouseProfiles.Services
         }
         public void SaveProfiles(IEnumerable<MouseProfileModel> profiles)
         {
-            profiles = profiles.Skip(1);
-            Database.SaveMouseProfiles(profiles);
+            List<MouseProfileModel> profilees = profiles.Except(new List<MouseProfileModel>() { profiles.First() }).ToList();
+            Database.SaveMouseProfiles(profilees);
         }
         const int SM_SWAPBUTTON = 0x0017;
         const int SPI_GETMOUSESPEED = 0x0070;

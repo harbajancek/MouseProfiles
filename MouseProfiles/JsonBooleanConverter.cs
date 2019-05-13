@@ -25,8 +25,6 @@ namespace MouseProfiles
             switch (value)
             {
                 case "true":
-                case "yes":
-                case "y":
                 case "1":
                     return true;
             }

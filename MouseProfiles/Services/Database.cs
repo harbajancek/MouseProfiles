@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MouseProfiles
+namespace MouseProfiles.Services
 {
     class Database
     {
@@ -18,10 +18,11 @@ namespace MouseProfiles
         public Database(string dbName)
         {
             this.dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dbName + ".json");
+            settings.Converters.Add(new JsonBooleanConverter());
         }
-        public IEnumerable<MouseProfileModel> GetProfilesFromPHP()
+        public IEnumerable<MouseProfileModel> GetProfilesFromAPI()
         {
-            var response = client.GetAsync("https://harbaja16.sps-prosek.cz/MouseProfiles/jsonGetMouseProfiles.php").GetAwaiter().GetResult();
+            var response = MouseProfileAPI.GetAllProfiles(client).GetAwaiter().GetResult();
             if (!response.IsSuccessStatusCode)
             {
                 return null;
@@ -31,7 +32,7 @@ namespace MouseProfiles
         }
         public IEnumerable<MouseProfileModel> GetMouseProfiles()
         {
-            var profiles = GetProfilesFromPHP();
+            var profiles = GetProfilesFromAPI();
             if (profiles != null)
             {
                 return profiles;
@@ -41,10 +42,18 @@ namespace MouseProfiles
                 return JsonConvert.DeserializeObject<IEnumerable<MouseProfileModel>>(GetStringData());
             }
         }
+        public void SaveProfilesToAPI(IEnumerable<MouseProfileModel> profiles)
+        {
+            settings.TypeNameHandling = TypeNameHandling.None;
+            string data = JsonConvert.SerializeObject(profiles, settings);
+            var response = MouseProfileAPI.PostInsertData(client, data).GetAwaiter().GetResult();
+            var str = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+        }
         public void SaveMouseProfiles(IEnumerable<MouseProfileModel> profiles)
         {
             string data = JsonConvert.SerializeObject(profiles, settings);
             File.WriteAllText(dbPath, data);
+            SaveProfilesToAPI(profiles);
         }
         string GetStringData()
         {

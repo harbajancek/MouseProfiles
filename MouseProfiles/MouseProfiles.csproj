@@ -63,6 +63,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="JsonBooleanConverter.cs" />
+    <Compile Include="Services\MouseProfileAPI.cs" />
     <Compile Include="Services\MouseProfileService.cs" />
     <Compile Include="ViewModels\MouseProfileViewModel.cs" />
     <Page Include="MainWindow.xaml">
@@ -73,7 +74,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Database.cs" />
+    <Compile Include="Services\Database.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
